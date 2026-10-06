@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AeroSudoku 4K Paradox - Professional Aerospace Sudoku</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#050a14',
+                            panel: 'rgba(12, 22, 45, 0.85)',
+                            border: 'rgba(0, 240, 255, 0.3)',
+                            primary: '#00f0ff',
+                            secondary: '#7000ff',
+                            accent: '#ff0077',
+                            warning: '#ffb700',
+                            success: '#00ff66',
+                            text: '#e2f1ff'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full flex flex-col justify-between text-slate-100 select-none">
+    <canvas id="particleCanvas"></canvas>
+    <header class="w-full max-w-4xl mx-auto px-4 pt-3 pb-1 flex items-center justify-between z-20">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 border border-cyan-400/40">
+                <i class="fa-solid font-orbitron text-xl text-black font-black">S</i>
+            </div>
+            <div>
+                <h1 class="font-orbitron font-extrabold text-lg sm:text-xl tracking-wider text-white flex items-center gap-2 cyber-text">AERO<span class="text-cyan-400">SUDOKU</span><span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono">4K PARADOX</span></h1>
+                <p id="modeBadge" class="text-xs text-cyan-400/80 font-semibold tracking-wide">CLASSIC MODE • EXPERT</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button id="themeBtn" title="Cycle Themes" class="p-2.5 rounded-xl cyber-card hover:border-cyan-400 transition text-cyan-400"><i class="fa-solid fa-palette text-lg"></i></button>
+            <button id="settingsBtn" title="Settings" class="p-2.5 rounded-xl cyber-card hover:border-cyan-400 transition text-cyan-400"><i class="fa-solid fa-sliders text-lg"></i></button>
+            <button id="statsBtn" title="Statistics" class="p-2.5 rounded-xl cyber-card hover:border-cyan-400 transition text-cyan-400"><i class="fa-solid fa-chart-column text-lg"></i></button>
+        </div>
+    </header>
+    <main class="flex-1 max-w-4xl w-full mx-auto px-2 sm:px-4 flex flex-col items-center justify-center space-y-2 z-10 my-1">
+        <div class="w-full max-w-lg cyber-card rounded-2xl p-2.5 flex items-center justify-between text-sm font-orbitron shadow-xl">
+            <div class="relative inline-block text-left">
+                <button id="diffDropdownBtn" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition"><span id="currentDiffLabel">EXPERT</span><i class="fa-solid fa-chevron-down text-xs"></i></button>
+                <div id="diffMenu" class="hidden absolute left-0 mt-2 w-36 rounded-xl cyber-card border border-cyan-500/40 shadow-2xl z-50 overflow-hidden text-xs py-1">
+                    <button class="diff-option w-full text-left px-3 py-2 hover:bg-cyan-500/20 transition text-emerald-400 font-bold" data-diff="easy">EASY</button>
+                    <button class="diff-option w-full text-left px-3 py-2 hover:bg-cyan-500/20 transition text-cyan-400 font-bold" data-diff="medium">MEDIUM</button>
+                    <button class="diff-option w-full text-left px-3 py-2 hover:bg-cyan-500/20 transition text-amber-400 font-bold" data-diff="hard">HARD</button>
+                    <button class="diff-option w-full text-left px-3 py-2 hover:bg-cyan-500/20 transition text-rose-400 font-bold" data-diff="expert">EXPERT</button>
+                    <button class="diff-option w-full text-left px-3 py-2 hover:bg-cyan-500/20 transition text-purple-400 font-bold" data-diff="master">MASTER</button>
+                    <button class="diff-option w-full text-left px-3 py-2 hover:bg-cyan-500/20 transition text-pink-500 font-bold" data-diff="paradox">PARADOX</button>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 px-3 py-1 rounded-xl bg-black/40 border border-cyan-500/20">
+                <i id="timerIcon" class="fa-regular fa-clock text-cyan-400 animate-pulse"></i>
+                <span id="timerText" class="font-mono text-base tracking-wider text-cyan-200">00:00</span>
+                <button id="pauseBtn" title="Pause Game" class="ml-1 text-xs text-gray-400 hover:text-cyan-300"><i class="fa-solid fa-pause"></i></button>
+            </div>
+            <div class="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-black/40 border border-rose-500/20">
+                <span class="text-xs text-gray-400">MISTAKES</span>
+                <span id="mistakeCount" class="font-bold text-rose-400">0/3</span>
+            </div>
+        </div>
+        <div class="w-full max-w-lg flex items-center justify-between bg-black/40 p-1 rounded-xl border border-white/10 text-[11px] font-semibold overflow-x-auto">
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition border border-cyan-400/40 bg-cyan-500/20 text-cyan-300 whitespace-nowrap active-mode" data-mode="classic">Classic</button>
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition text-gray-400 hover:text-cyan-300 whitespace-nowrap" data-mode="killer">Killer</button>
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition text-gray-400 hover:text-cyan-300 whitespace-nowrap" data-mode="xsudoku">X-Diagonals</button>
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition text-gray-400 hover:text-cyan-300 whitespace-nowrap" data-mode="alpha">Alpha Paradox</button>
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition text-gray-400 hover:text-cyan-300 whitespace-nowrap" data-mode="daily">Daily Paradox</button>
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition text-gray-400 hover:text-cyan-300 whitespace-nowrap" data-mode="timeattack">Time Attack</button>
+            <button class="mode-tab flex-1 py-1.5 px-2 rounded-lg text-center transition text-gray-400 hover:text-cyan-300 whitespace-nowrap" data-mode="robot">Robot Race</button>
+        </div>
+        <div id="robotRaceBarContainer" class="w-full max-w-lg hidden flex-col gap-1 px-1">
+            <div class="flex justify-between text-xs font-mono text-purple-300"><span>YOU</span><span>AI SOLVER</span></div>
+            <div class="w-full h-2.5 bg-black/60 rounded-full overflow-hidden flex border border-purple-500/30">
+                <div id="playerProgressBar" class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300" style="width: 0%"></div>
+                <div id="robotProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+        <div id="boardWrapper" class="board-container relative p-2 rounded-2xl cyber-card transition-transform duration-100 shadow-2xl">
+            <div id="pauseOverlay" class="hidden absolute inset-0 rounded-2xl bg-black/90 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-4">
+                <i class="fa-solid fa-pause text-5xl text-cyan-400 animate-bounce"></i>
+                <h2 class="font-orbitron text-xl font-bold text-white tracking-widest">GAME PAUSED</h2>
+                <button id="resumeBtn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 text-black font-bold font-orbitron shadow-lg hover:scale-105 transition">RESUME PLAY</button>
+            </div>
+            <div id="sudokuBoard" class="grid grid-cols-9 bg-slate-900 rounded-xl overflow-hidden shadow-2xl border-2 border-cyan-400/50"></div>
+        </div>
+        <div class="w-full max-w-md flex justify-between px-2 text-xs font-mono text-cyan-400">
+            <span id="count-1">1: 0/9</span><span id="count-2">2: 0/9</span><span id="count-3">3: 0/9</span><span id="count-4">4: 0/9</span><span id="count-5">5: 0/9</span><span id="count-6">6: 0/9</span><span id="count-7">7: 0/9</span><span id="count-8">8: 0/9</span><span id="count-9">9: 0/9</span>
+        </div>
+        <div class="w-full max-w-lg grid grid-cols-6 gap-1.5 px-1 text-xs">
+            <button id="undoBtn" class="flex flex-col items-center justify-center p-2 rounded-xl cyber-card hover:border-cyan-400 active:scale-95 transition"><i class="fa-solid fa-rotate-left text-sm text-cyan-400 mb-1"></i><span class="font-semibold text-[10px] text-gray-300">Undo</span></button>
+            <button id="redoBtn" class="flex flex-col items-center justify-center p-2 rounded-xl cyber-card hover:border-cyan-400 active:scale-95 transition"><i class="fa-solid fa-rotate-right text-sm text-cyan-400 mb-1"></i><span class="font-semibold text-[10px] text-gray-300">Redo</span></button>
+            <button id="eraseBtn" class="flex flex-col items-center justify-center p-2 rounded-xl cyber-card hover:border-cyan-400 active:scale-95 transition"><i class="fa-solid fa-eraser text-sm text-rose-400 mb-1"></i><span class="font-semibold text-[10px] text-gray-300">Erase</span></button>
+            <button id="pencilBtn" class="flex flex-col items-center justify-center p-2 rounded-xl cyber-card hover:border-cyan-400 active:scale-95 transition relative"><span id="pencilBadge" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-cyan-400"></span><i class="fa-solid fa-pencil text-sm text-amber-400 mb-1"></i><span id="pencilText" class="font-semibold text-[10px] text-gray-300">Notes OFF</span></button>
+            <button id="hintBtn" class="flex flex-col items-center justify-center p-2 rounded-xl cyber-card hover:border-cyan-400 active:scale-95 transition"><i class="fa-solid fa-lightbulb text-sm text-yellow-300 mb-1"></i><span class="font-semibold text-[10px] text-gray-300">Smart Hint</span></button>
+            <button id="stepBtn" class="flex flex-col items-center justify-center p-2 rounded-xl cyber-card hover:border-cyan-400 active:scale-95 transition"><i class="fa-solid fa-brain text-sm text-purple-400 mb-1"></i><span class="font-semibold text-[10px] text-gray-300">Step Logic</span></button>
+        </div>
+        <div class="w-full max-w-lg grid grid-cols-9 gap-1 sm:gap-2 px-1 pt-1">
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="1">1</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="2">2</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="3">3</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="4">4</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="5">5</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="6">6</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="7">7</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="8">8</button>
+            <button class="numpad-btn h-12 rounded-xl cyber-card text-xl font-orbitron font-extrabold text-cyan-300 hover:bg-cyan-500/30 active:scale-90 transition border border-cyan-500/20 shadow-md flex items-center justify-center" data-num="9">9</button>
+        </div>
+        <div class="w-full max-w-lg flex gap-3 pt-1">
+            <button id="newGameBtn" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 text-black font-orbitron font-extrabold text-sm tracking-wider shadow-lg hover:shadow-cyan-500/50 active:scale-98 transition flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> NEW PUZZLE</button>
+            <button id="solveBtn" class="px-5 py-2.5 rounded-xl cyber-card text-purple-300 font-orbitron font-bold text-sm hover:border-purple-400 active:scale-98 transition flex items-center justify-center gap-2"><i class="fa-solid fa-robot"></i> INSTANT SOLVE</button>
+            <button id="restartBtn" class="px-5 py-2.5 rounded-xl cyber-card text-cyan-300 font-orbitron font-bold text-sm hover:border-cyan-400 active:scale-98 transition flex items-center justify-center gap-2"><i class="fa-solid fa-arrow-rotate-right"></i> RESET</button>
+        </div>
+    </main>
+    <div id="hintModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md cyber-card rounded-2xl p-6 border border-cyan-400/50 shadow-2xl space-y-4 animate-pop">
+            <div class="flex items-center space-x-3 text-amber-400"><i class="fa-solid fa-brain text-2xl"></i><h3 class="font-orbitron font-bold text-lg text-white">TACTICAL LOGIC HINT</h3></div>
+            <div id="hintContent" class="text-sm leading-relaxed text-cyan-100 space-y-2"></div>
+            <button id="closeHintBtn" class="w-full py-2.5 rounded-xl bg-cyan-400 text-black font-orbitron font-bold hover:bg-cyan-300 transition">UNDERSTOOD</button>
+        </div>
+    </div>
+    <div id="winModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-lg flex items-center justify-center p-4">
+        <div class="w-full max-w-md cyber-card rounded-3xl p-6 border-2 border-cyan-400 text-center space-y-5 animate-pop">
+            <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-2xl shadow-cyan-500/50"><i class="fa-solid fa-trophy text-4xl text-yellow-300 animate-bounce"></i></div>
+            <div><h2 class="font-orbitron text-2xl font-black tracking-wider text-white">PUZZLE DISMANTLED!</h2><p id="winSubtext" class="text-xs text-cyan-300 mt-1">AEROSUDOKU 4K COGNITIVE VICTORY</p></div>
+            <div class="grid grid-cols-2 gap-3 bg-black/40 p-4 rounded-2xl border border-white/10 text-left">
+                <div><span class="text-xs text-gray-400 block">TIME TAKEN</span><span id="winTime" class="font-mono text-lg font-bold text-cyan-300">03:45</span></div>
+                <div><span class="text-xs text-gray-400 block">DIFFICULTY</span><span id="winDiff" class="font-mono text-lg font-bold text-purple-400">EXPERT</span></div>
+                <div><span class="text-xs text-gray-400 block">BRAIN IQ SCORE</span><span id="winIq" class="font-mono text-lg font-bold text-emerald-400">142 IQ</span></div>
+                <div><span class="text-xs text-gray-400 block">ACCURACY</span><span id="winAcc" class="font-mono text-lg font-bold text-amber-400">100%</span></div>
+            </div>
+            <div class="flex gap-3">
+                <button id="shareBtn" class="flex-1 py-3 rounded-xl cyber-card text-cyan-300 font-orbitron font-bold text-sm hover:border-cyan-400 transition flex items-center justify-center gap-2"><i class="fa-solid fa-share-nodes"></i> SHARE RESULT</button>
+                <button id="nextPuzzleBtn" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 text-black font-orbitron font-bold text-sm hover:scale-105 transition shadow-lg">NEXT PUZZLE</button>
+            </div>
+        </div>
+    </div>
+    <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md cyber-card rounded-2xl p-6 border border-cyan-400/40 space-y-5">
+            <div class="flex justify-between items-center border-b border-white/10 pb-3"><h3 class="font-orbitron font-bold text-lg text-white">SYSTEM CONFIGURATION</h3><button id="closeSettingsBtn" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="space-y-4 text-sm">
+                <div class="flex items-center justify-between"><div><div class="font-semibold text-white">Real-Time Error Check</div><div class="text-xs text-gray-400">Warn or block invalid placements</div></div><select id="errorModeSelect" class="bg-black/60 border border-cyan-400/40 text-cyan-300 rounded-lg px-2 py-1 text-xs font-mono"><option value="warn">WARN</option><option value="block">BLOCK</option><option value="off">OFF</option></select></div>
+                <div class="flex items-center justify-between"><div><div class="font-semibold text-white">Auto-Erase Notes</div><div class="text-xs text-gray-400">Remove pencil notes on placement</div></div><input type="checkbox" id="autoPencilToggle" checked class="w-5 h-5 accent-cyan-400 rounded cursor-pointer"></div>
+                <div class="flex items-center justify-between"><div><div class="font-semibold text-white">3D Parallax Motion</div><div class="text-xs text-gray-400">Tilt board with mouse cursor</div></div><input type="checkbox" id="parallaxToggle" checked class="w-5 h-5 accent-cyan-400 rounded cursor-pointer"></div>
+                <div class="flex items-center justify-between"><div><div class="font-semibold text-white">Synthesizer SFX</div><div class="text-xs text-gray-400">Audio tone responses</div></div><input type="checkbox" id="soundToggle" checked class="w-5 h-5 accent-cyan-400 rounded cursor-pointer"></div>
+            </div>
+        </div>
+    </div>
+    <div id="statsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md cyber-card rounded-2xl p-6 border border-cyan-400/40 space-y-5">
+            <div class="flex justify-between items-center border-b border-white/10 pb-3"><h3 class="font-orbitron font-bold text-lg text-white">PLAYER DOSSIER & STATS</h3><button id="closeStatsBtn" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="grid grid-cols-2 gap-3 font-mono text-center">
+                <div class="bg-black/40 p-3 rounded-xl border border-white/10"><span class="text-xs text-gray-400 block">GAMES SOLVED</span><span id="statSolved" class="text-xl font-bold text-cyan-300">0</span></div>
+                <div class="bg-black/40 p-3 rounded-xl border border-white/10"><span class="text-xs text-gray-400 block">CURRENT STREAK</span><span id="statStreak" class="text-xl font-bold text-emerald-400">0</span></div>
+                <div class="bg-black/40 p-3 rounded-xl border border-white/10"><span class="text-xs text-gray-400 block">BEST TIME</span><span id="statBestTime" class="text-xl font-bold text-amber-400">--:--</span></div>
+                <div class="bg-black/40 p-3 rounded-xl border border-white/10"><span class="text-xs text-gray-400 block">AVG BRAIN IQ</span><span id="statAvgIq" class="text-xl font-bold text-purple-400">120</span></div>
+            </div>
+        </div>
+    </div>
+    <footer class="w-full text-center py-2 text-[10px] text-gray-500 font-mono z-20">AEROSUDOKU 4K ENGINE • 100% OFFLINE SAFE</footer>
+    <script src="audio/audio.js"></script>
+    <script src="js/sudoku.js"></script>
+    <script src="js/solver.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
