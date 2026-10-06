@@ -29,7 +29,7 @@ class SudokuEngine {
             }
             if (row + col === 8) {
                 for (let i = 0; i < 9; i++) {
-                    if (board[i * 9 + (8 - i)] === num && (i * 9 + (8 - i) !== index) === false);
+                    if (board[i * 9 + (8 - i)] === num && (i * 9 + (8 - i)) !== index) return false;
                 }
             }
         }
