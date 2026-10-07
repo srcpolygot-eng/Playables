@@ -7,6 +7,6 @@ No frameworks, no build step — just open `index.html` or serve the folder.
 
 | Folder | Title | Stack |
 |--------|-------|-------|
-| — | Coming soon | — |
+| [Sudoku](./Sudoku) | Zenoku — Soft Minimal Paper Sudoku | HTML, CSS, JS |
 
 Each game lives in its own folder as a static site.
