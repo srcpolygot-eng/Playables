@@ -1,50 +1,30 @@
 # Zenoku — Soft Minimal Paper Sudoku
 
 Clean, calm, premium Sudoku built for **YouTube Playables**.
-Pure HTML + CSS + JS. No frameworks, no build step.
+**TypeScript + Vite**. No UI frameworks.
 
-Open `index.html` or serve the folder with any static server.
+```bash
+npm install
+npm run dev      # local
+npm run build    # → dist/
+```
 
 ## Design
 
-**Soft Minimal Paper**
-- Warm off-white background (`#F8F5F0`)
-- Soft shadows, rounded cells
-- Deep indigo player numbers
-- Calm accents only
-- Dark mode toggle included
+**Soft Minimal Paper** — warm cream background, soft shadows, indigo accents, dark mode toggle.
 
 ## Features
 
-- Classic Sudoku with 4 difficulties (Easy → Expert)
-- Pencil notes (toggle or press `N`)
-- Undo, Hint, Erase
+- Classic Sudoku · 4 difficulties
+- Pencil notes · Undo · Hint · Erase
 - Timer + autosave (localStorage)
-- Keyboard support (arrows, 1–9, Backspace)
-- Soft win celebration
-- Responsive portrait-first layout
+- Keyboard support
+- Portrait-first layout
 
-## Controls
+## Stack
 
-| Input | Action |
-|-------|--------|
-| Tap / click cell | Select |
-| 1–9 | Place number or note |
-| Backspace / Delete | Erase |
-| N | Toggle notes mode |
-| Arrows | Move selection |
-| Ctrl/Cmd + Z | Undo |
-
-## Files
-
-```
-Sudoku/
-├── index.html
-├── css/main.css
-├── js/
-│   ├── sudoku.js    Generator + solver helpers
-│   ├── storage.js   localStorage
-│   ├── app.js       Game controller
-│   └── main.js      Boot
-└── README.md
-```
+| | |
+|---|---|
+| Language | TypeScript |
+| Bundler | Vite |
+| Deploy | Vercel (root: `Sudoku`) |

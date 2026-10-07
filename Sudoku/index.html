@@ -8,11 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
     <header class="header">
       <div class="brand">Zenoku</div>
       <div class="header-right">
@@ -26,7 +25,6 @@
       </div>
     </header>
 
-    <!-- Difficulty + New -->
     <div class="toolbar">
       <div class="difficulty-group">
         <button class="diff-btn active" data-diff="easy">Easy</button>
@@ -37,12 +35,10 @@
       <button class="text-btn" id="btn-new">New Game</button>
     </div>
 
-    <!-- Board -->
     <main class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
     </main>
 
-    <!-- Action bar -->
     <div class="actions">
       <button class="action-btn" id="btn-notes" title="Notes (N)">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,7 +67,6 @@
       </button>
     </div>
 
-    <!-- Number pad -->
     <div class="numpad" id="numpad">
       <button class="num-btn" data-num="1">1</button>
       <button class="num-btn" data-num="2">2</button>
@@ -84,7 +79,6 @@
       <button class="num-btn" data-num="9">9</button>
     </div>
 
-    <!-- Win overlay -->
     <div class="overlay" id="win-overlay" hidden>
       <div class="win-card">
         <div class="win-icon">✓</div>
@@ -95,9 +89,6 @@
     </div>
   </div>
 
-  <script src="js/sudoku.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/main.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
