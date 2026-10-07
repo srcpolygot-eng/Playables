@@ -1,11 +1,12 @@
 # Playables
 
-Self-contained HTML / CSS / JS games. No frameworks, no build.
+Self-contained HTML5 / CSS / JS (and WebGL) games built for YouTube Playables.
+No frameworks, no build step — just open `index.html` or serve the folder.
 
 ## Games
 
 | Folder | Title | Stack |
-|---|---|---|
-| [AeroSudoku](./AeroSudoku) | AeroSudoku 4K Paradox | HTML, CSS, JS |
+|--------|-------|-------|
+| — | Coming soon | — |
 
-Each game is a folder you can open as a static site (`index.html`).
+Each game lives in its own folder as a static site.
