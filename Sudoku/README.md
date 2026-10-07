@@ -1,30 +1,48 @@
-# Zenoku — Soft Minimal Paper Sudoku
+# Zenoku v2 — Soft Minimal Paper Sudoku
 
-Clean, calm, premium Sudoku built for **YouTube Playables**.
-**TypeScript + Vite**. No UI frameworks.
+TypeScript + Vite. Built for **YouTube Playables**.
 
 ```bash
 npm install
-npm run dev      # local
-npm run build    # → dist/
+npm run dev
+npm run build   # → dist/  (zip for Playables)
 ```
-
-## Design
-
-**Soft Minimal Paper** — warm cream background, soft shadows, indigo accents, dark mode toggle.
 
 ## Features
 
-- Classic Sudoku · 4 difficulties
-- Pencil notes · Undo · Hint · Erase
-- Timer + autosave (localStorage)
-- Keyboard support
-- Portrait-first layout
+### Core
+- Classic Sudoku · Easy → Expert
+- **Daily puzzle** (seeded by date — same for everyone)
+- Pencil notes · Undo · Erase
+- Soft win confetti + stats + rewards
+- Dark mode · system fonts (no CDN)
 
-## Stack
+### Economy
+- **Coins** & **Gems**
+- Shop + inventory bag
+- Win rewards scale by difficulty / daily / time
 
-| | |
-|---|---|
-| Language | TypeScript |
-| Bundler | Vite |
-| Deploy | Vercel (root: `Sudoku`) |
+### Items (22)
+Magnifying Glass · Robot · Eraser Plus · Time Freeze · Double Coins · Lucky Charm · Spotlight · Pencil Master · Undo Stack · Error Shield · Compass · Note Bomb · Wizard Wand · Hourglass · Daily Key · Streak Shield · Mirror Notes · Focus Boost · Night Owl · Crown
+
+### Gamepasses
+- **Admin Tools** — toggle solution ghost overlay (`S`)
+- **Dev Console** — debug panel (`` ` `` key)
+
+### YouTube Playables SDK
+- Loads `game_api/v1`
+- `firstFrameReady` / `gameReady`
+- Pause / resume timer
+- Audio flag respected (Web Audio SFX)
+- `sendScore` on win
+
+## Controls
+
+| Input | Action |
+|-------|--------|
+| 1–9 | Place / note |
+| N | Notes mode |
+| Arrows | Move |
+| Ctrl/Cmd+Z | Undo |
+| ` | Dev console (if owned) |
+| S | Solution overlay (Admin Tools) |
