@@ -1,4 +1,4 @@
-/** Zenoku — Sudoku engine (generator + validator + hints) */
+/** Zenoku — Sudoku engine (seeded generator + validator + hints) */
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 export type Board = number[][];
@@ -20,6 +20,30 @@ export interface HintResult {
   col: number;
   num: number;
   type?: string;
+}
+
+/** Mulberry32 seeded PRNG */
+export function makeRng(seed: number): () => number {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function hashString(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+export function todayKey(): string {
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function emptyBoard(): Board {
@@ -53,19 +77,23 @@ function findEmpty(board: Board): [number, number] | null {
   return null;
 }
 
-export function solve(board: Board): boolean {
+function shuffleInPlace<T>(arr: T[], rng: () => number): void {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+export function solve(board: Board, rng: () => number = Math.random): boolean {
   const pos = findEmpty(board);
   if (!pos) return true;
   const [r, c] = pos;
   const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  for (let i = nums.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [nums[i], nums[j]] = [nums[j], nums[i]];
-  }
+  shuffleInPlace(nums, rng);
   for (const n of nums) {
     if (isValid(board, r, c, n)) {
       board[r][c] = n;
-      if (solve(board)) return true;
+      if (solve(board, rng)) return true;
       board[r][c] = 0;
     }
   }
@@ -95,20 +123,20 @@ function countSolutions(board: Board, limit = 2): number {
   return count;
 }
 
-export function generatePuzzle(diff: Difficulty = 'medium'): { puzzle: Board; solution: Board } {
+export function generatePuzzle(
+  diff: Difficulty = 'medium',
+  seed?: number,
+): { puzzle: Board; solution: Board } {
+  const rng = seed !== undefined ? makeRng(seed) : Math.random;
   const solution = emptyBoard();
-  solve(solution);
+  solve(solution, rng);
 
   const puzzle = copyBoard(solution);
   const targetClues = DIFFICULTY[diff]?.clues ?? 32;
 
   const cells: [number, number][] = [];
   for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) cells.push([r, c]);
-
-  for (let i = cells.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [cells[i], cells[j]] = [cells[j], cells[i]];
-  }
+  shuffleInPlace(cells, rng);
 
   let clues = 81;
   for (const [r, c] of cells) {
@@ -123,6 +151,13 @@ export function generatePuzzle(diff: Difficulty = 'medium'): { puzzle: Board; so
   }
 
   return { puzzle, solution };
+}
+
+export function generateDaily(diff: Difficulty = 'medium'): { puzzle: Board; solution: Board; key: string } {
+  const key = todayKey();
+  const seed = hashString(`zenoku-daily-${key}-${diff}`);
+  const { puzzle, solution } = generatePuzzle(diff, seed);
+  return { puzzle, solution, key };
 }
 
 export function getCandidates(board: Board, row: number, col: number): number[] {
@@ -148,6 +183,38 @@ export function getHint(board: Board): HintResult | null {
   return null;
 }
 
+export function fillNakedSingles(board: Board, solution: Board): number {
+  let n = 0;
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (board[r][c] === 0) {
+          const cands = getCandidates(board, r, c);
+          if (cands.length === 1) {
+            board[r][c] = cands[0];
+            n++;
+            changed = true;
+          }
+        }
+      }
+    }
+  }
+  // fallback one cell if none
+  if (n === 0) {
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (board[r][c] === 0) {
+          board[r][c] = solution[r][c];
+          return 1;
+        }
+      }
+    }
+  }
+  return n;
+}
+
 export function isComplete(board: Board): boolean {
   for (let r = 0; r < 9; r++)
     for (let c = 0; c < 9; c++)
@@ -162,7 +229,6 @@ export function isCorrect(board: Board, solution: Board): boolean {
   return true;
 }
 
-/** Check if placing val at r,c conflicts (ignoring the cell itself) */
 export function isValidPlacement(board: Board, row: number, col: number, num: number): boolean {
   for (let i = 0; i < 9; i++) {
     if (i !== col && board[row][i] === num) return false;

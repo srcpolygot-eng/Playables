@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#F8F5F0" />
   <title>Zenoku — Soft Minimal Sudoku</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://www.youtube.com/game_api/v1"></script>
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
@@ -15,56 +13,40 @@
     <header class="header">
       <div class="brand">Zenoku</div>
       <div class="header-right">
+        <div class="currency" id="currency">
+          <span class="pill" title="Coins">🪙 <b id="coins">0</b></span>
+          <span class="pill" title="Gems">💎 <b id="gems">0</b></span>
+        </div>
         <div class="timer" id="timer">00:00</div>
-        <button class="icon-btn" id="btn-theme" title="Toggle theme" aria-label="Toggle theme">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-          </svg>
-        </button>
+        <button class="icon-btn" id="btn-shop" title="Shop">🛒</button>
+        <button class="icon-btn" id="btn-bag" title="Items">🎒</button>
+        <button class="icon-btn" id="btn-theme" title="Theme">◐</button>
       </div>
     </header>
 
     <div class="toolbar">
-      <div class="difficulty-group">
+      <div class="difficulty-group" id="diff-group">
         <button class="diff-btn active" data-diff="easy">Easy</button>
-        <button class="diff-btn" data-diff="medium">Medium</button>
+        <button class="diff-btn" data-diff="medium">Med</button>
         <button class="diff-btn" data-diff="hard">Hard</button>
         <button class="diff-btn" data-diff="expert">Expert</button>
+        <button class="diff-btn daily" data-diff="daily">Daily</button>
       </div>
-      <button class="text-btn" id="btn-new">New Game</button>
+      <button class="text-btn" id="btn-new">New</button>
     </div>
 
     <main class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+      <canvas id="confetti" class="confetti" hidden></canvas>
     </main>
 
+    <div class="quick-items" id="quick-items"></div>
+
     <div class="actions">
-      <button class="action-btn" id="btn-notes" title="Notes (N)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-        <span>Notes</span>
-      </button>
-      <button class="action-btn" id="btn-undo" title="Undo (Ctrl+Z)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
-        </svg>
-        <span>Undo</span>
-      </button>
-      <button class="action-btn" id="btn-hint" title="Hint">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-        <span>Hint</span>
-      </button>
-      <button class="action-btn" id="btn-erase" title="Erase">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 20H7L3 16c-.5-.5-.5-1.5 0-2l9.5-9.5c.5-.5 1.5-.5 2 0L20 10c.5.5.5 1.5 0 2L12 20"/>
-          <path d="M18 13l-5 5"/>
-        </svg>
-        <span>Erase</span>
-      </button>
+      <button class="action-btn" id="btn-notes" title="Notes (N)"><span class="ab-icon">✏️</span><span>Notes</span></button>
+      <button class="action-btn" id="btn-undo" title="Undo"><span class="ab-icon">↩️</span><span>Undo</span></button>
+      <button class="action-btn" id="btn-hint" title="Hint"><span class="ab-icon">💡</span><span>Hint</span></button>
+      <button class="action-btn" id="btn-erase" title="Erase"><span class="ab-icon">⌫</span><span>Erase</span></button>
     </div>
 
     <div class="numpad" id="numpad">
@@ -79,12 +61,53 @@
       <button class="num-btn" data-num="9">9</button>
     </div>
 
+    <!-- Win -->
     <div class="overlay" id="win-overlay" hidden>
       <div class="win-card">
-        <div class="win-icon">✓</div>
-        <h2>Completed</h2>
+        <div class="win-icon" id="win-icon">✓</div>
+        <h2 id="win-title">Completed</h2>
         <p id="win-time">Time: 00:00</p>
+        <div class="win-stats" id="win-stats"></div>
+        <div class="win-rewards" id="win-rewards"></div>
         <button class="primary-btn" id="btn-win-new">New Game</button>
+      </div>
+    </div>
+
+    <!-- Shop -->
+    <div class="overlay sheet" id="shop-overlay" hidden>
+      <div class="sheet-card">
+        <div class="sheet-head">
+          <h2>Shop</h2>
+          <button class="icon-btn" id="btn-shop-close">✕</button>
+        </div>
+        <div class="sheet-body" id="shop-list"></div>
+      </div>
+    </div>
+
+    <!-- Bag -->
+    <div class="overlay sheet" id="bag-overlay" hidden>
+      <div class="sheet-card">
+        <div class="sheet-head">
+          <h2>Items</h2>
+          <button class="icon-btn" id="btn-bag-close">✕</button>
+        </div>
+        <div class="sheet-body" id="bag-list"></div>
+      </div>
+    </div>
+
+    <!-- Dev console -->
+    <div class="overlay sheet" id="dev-overlay" hidden>
+      <div class="sheet-card">
+        <div class="sheet-head">
+          <h2>Dev Console</h2>
+          <button class="icon-btn" id="btn-dev-close">✕</button>
+        </div>
+        <div class="sheet-body dev-body">
+          <button class="text-btn" id="dev-solve">Solve board</button>
+          <button class="text-btn" id="dev-coins">+500 coins</button>
+          <button class="text-btn" id="dev-gems">+20 gems</button>
+          <button class="text-btn" id="dev-reset">Reset economy</button>
+        </div>
       </div>
     </div>
   </div>
